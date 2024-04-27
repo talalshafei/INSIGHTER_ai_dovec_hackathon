@@ -14,10 +14,6 @@ class FilePathSchema(BaseModel):
     filePath: str = Field(..., title="Filepath", description="File path required")
 
 
-class SuggestResponseCustomerSchema(BaseModel):
-    pass
-
-
 def file_reader(filePath: str):
     try:
         with open(filePath, 'r') as file:
@@ -32,11 +28,9 @@ def find_best_property():
 
 
 def suggest_response_customer():
-    try:
-        data = file_reader("sample_customer_data.xlsx")
-    except Exception as e:
-        data = str(e)
-    return data
+    file = pd.read_excel('sample_customer_data.xlsx')
+    # get response from our server
+    return file.to_json()
 
 
 def classify_response(response: str):
@@ -88,7 +82,7 @@ tools = [
     {
         "name": "suggest_response_customer",
         "description": "Suggest a response to all the customers based on their previous responses that you read from the file data",
-        "parameters": custom_json_schema(SuggestResponseCustomerSchema),
+        "parameters": custom_json_schema(NoParamsSchema),
         "runCmd": suggest_response_customer,
         "isDangerous": False,
         "functionType": "backend",
