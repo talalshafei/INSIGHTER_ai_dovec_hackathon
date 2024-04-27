@@ -4,21 +4,22 @@ import requests
 from bs4 import BeautifulSoup
 import re
 
+
 def scrape_dovec_website():
 
     xml_url = "https://dovecconstruction.com/emlak.xml"
 
     # Send the request to the XML URL
     response = requests.get(xml_url)
-    
+
     # Check if the request was successful
     if response.status_code == 200:
         # Parse the XML content
         root = ET.fromstring(response.content)
-        
+
         # Create a list to store scraped data
         scraped_data = []
-        
+
         # Iterate over each item tag in the XML
         for item in root.findall('item'):
             title = item.find('title').text
@@ -37,10 +38,9 @@ def scrape_dovec_website():
 
             # Extract interior details
             interior_items = [i.text for i in item.findall('interior/item')]
-            
+
             # Extract exterior details
             exterior_items = [i.text for i in item.findall('external/item')]
-
 
             # Store the data in a dictionary
             property_data = {
@@ -65,6 +65,5 @@ def scrape_dovec_website():
         return None
 
 
-scraped_data = scrape_dovec_website()
-print(scraped_data)
-
+# scraped_data = scrape_dovec_website()
+# print(scraped_data)
