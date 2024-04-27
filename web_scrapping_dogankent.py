@@ -61,7 +61,6 @@ def scrape_dogankent_website(url, csv_filename):
             property_type = property_type_match.group() if property_type_match else None
 
 
-
             if square_meter:
                 square_meter = square_meter.group(1)
             else:

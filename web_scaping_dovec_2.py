@@ -44,6 +44,7 @@ def scrape_dovec_website():
 
             # Store the data in a dictionary
             property_data = {
+                "Name": title,
                 "Location": location,
                 "Price": price,
                 "currency": currency,
@@ -65,5 +66,5 @@ def scrape_dovec_website():
         return None
 
 
-# scraped_data = scrape_dovec_website()
-# print(scraped_data)
+#scraped_data = scrape_dovec_website()
+#print(scraped_data)
