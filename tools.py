@@ -65,33 +65,16 @@ def email_customer(emails: list[str], customized_responses: list[str]):
 
 
 def market_analysis():
-    dovec_data = scrape_dovec_website()[:5]
-    other_data = scrape_dogankent_website()[:5]
-
-    dovecDataFrame = pd.DataFrame(dovec_data)
-    dovec_data_json = dovecDataFrame.to_json(orient='records')
+    dovec_data = scrape_dovec_website()
     dovec_analysis_tool = RealEstateAnalysisTool(dovec_data)
     dovec_average_price = dovec_analysis_tool.average_price_per_square_meter()
     dovec_property_type = dovec_analysis_tool.property_type_distribution()
-
-    # other_data = scrape_dogankent_website()
-    # otherDataFrame = pd.DataFrame(other_data)
-    # other_data_json = otherDataFrame.to_json(orient='records')
-    # other_analysis_tool = RealEstateAnalysisTool(other_data)
-    # other_average_price = other_analysis_tool.average_price_per_square_meter()
-    # other_property_type = other_analysis_tool.property_type_distribution()
+    dovec_average_price_per_property_type = dovec_analysis_tool.average_price_per_property_type()
 
     response = {
-        "dovec": {
-            # "data": dovec_data_json,
-            "average_price": dovec_average_price,
-            "property_type": dovec_property_type
-        },
-        # "other_data": {
-        #     "data": other_data_json,
-        #     "average_price": other_average_price,
-        #     "property_type": other_property_type,
-        # }
+        "average_price_per_square_meter": dovec_average_price,
+        "property_type_distribution": dovec_property_type,
+        "average_price_per_property_type": dovec_average_price_per_property_type,
     }
 
     return response
@@ -142,12 +125,12 @@ tools = [
     },
     {
         "name": "market_analysis",
-        "description": "Conduct a thorough analysis of prevailing market trends within the real estate sector, leveraging data sourced from the Dovec website as well as other reputable platforms. Evaluate key metrics including average metric property prices, average price per square meter, regional variations, and pertinent market indicators. Provide nuanced insights into market conditions, highlighting emerging patterns, potential investment opportunities, and any significant factors shaping the current landscape. Your analysis should offer a comprehensive overview, empowering stakeholders with actionable intelligence to make informed decisions within the dynamic real estate market, be aware the data is structured in a json that has two keys one for Dovec and one for their competitors and it contains full data and other statistics",
+        "description": " Present a brief summary of the current real estate market trends and developments. Location Analysis: Visualize the average price per square meter for each location using a heatmap or bar chart. Analyze the distribution of property types in each location with a stacked bar chart or pie chart. Property Type Distribution: Display the distribution of property types using a pie chart or horizontal bar chart. Price Analysis: Compare the average price per square meter across different property types using a line graph or box plot. Conclusion: Summarize key insights and provide recommendations for stakeholders based on the analysis.",
         "parameters": custom_json_schema(NoParamsSchema),
         "runCmd": market_analysis,
         "isDangerous": False,
         "functionType": "backend",
-        "isLongRunningTool": True,
+        "isLongRunningTool": False,
         "rerun": True,
         "rerunWithDifferentParameters": True
     },
