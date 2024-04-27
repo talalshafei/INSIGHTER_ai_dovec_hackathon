@@ -9,6 +9,7 @@ from web_scaping_dovec_2 import scrape_dovec_website
 class NoParamsSchema(BaseModel):
     pass
 
+
 class FilePathSchema(BaseModel):
     filePath: str = Field(..., title="Filepath", description="File path required")
 
@@ -21,8 +22,9 @@ def file_reader(filePath: str):
 
 
 def find_best_property():
-    dovec_scraped_data = scrape_dovec_website()
+    dovec_scraped_data = scrape_dovec_website()[:5]
     return dovec_scraped_data
+
 
 def suggest_response_customer():
     file = pd.read_excel('sample_customer_data.xlsx')
@@ -30,9 +32,9 @@ def suggest_response_customer():
     return file
     
 
+
 def classify_response(response: str):
     pass
-
 
 
 # def market_analysis():
