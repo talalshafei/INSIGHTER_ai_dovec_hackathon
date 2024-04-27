@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+from RealEstateAnalysisTool import RealEstateAnalysisTool
 from web_scaping_dovec_2 import scrape_dovec_website
 from web_scrapping_dogankent import scrape_dogankent_website
 import pandas as pd
