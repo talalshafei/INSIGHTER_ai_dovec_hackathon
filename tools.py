@@ -1,6 +1,6 @@
-import os
 from pydantic import BaseModel, Field
 import requests
+from web_scraping_dovec import scrape_dovec_website_save
 
 ############# Dummy Tools ##############################
 
@@ -30,6 +30,10 @@ def product_finder(product: str):
 
 ######### END ###########################################################################################
 
+class NoParamsSchema(BaseModel):
+    pass
+
+
 class FilePathSchema(BaseModel):
     filePath: str = Field(..., title="Filepath", description="File path required")
 
@@ -37,6 +41,11 @@ class FilePathSchema(BaseModel):
 class RoleBasedReportPathSchema(BaseModel):
     reportPath: str = Field(..., title="ReportPath", description="Report path required")
     role: str = Field(..., title="Role", description="Role required")
+
+
+# class FindBestPropertySchema(BaseModel):
+#     budget: float = Field(..., title="Budget", description="Budget required")
+#     property_type: str = Field(..., title="Property Type", description="Property type required")
 
 
 def file_reader(filePath: str):
@@ -53,6 +62,13 @@ def summarize_report_based_on_role(reportPath: str, role: str):
             return {"role": role, "report": reportFile.read()}
     except Exception as e:
         return str(e)
+
+
+def find_best_property():
+    dovec_scraped_data = scrape_dovec_website_save(
+        "https://dovecconstruction.com/en/real-estate/?filter%5Bsearch%5D=&filter%5Bcategory%5D=0&filter%5Btype%5D=0&filter%5Bcity%5D=0&filter%5Bdistrict%5D=0&filter%5Bmin%5D=10&filter%5Bmax%5D=400", "dovec-ai-data.csv")
+
+    return dovec_scraped_data
 
 
 def custom_json_schema(model):
@@ -73,6 +89,18 @@ def custom_json_schema(model):
 
 
 tools = [
+    {
+        "name": "find_best_property",
+        "description": "Given the customer's preferences and budget constraints, analyze the provided prompt and utilize the data returned from the function to recommend the most suitable property. Consider factors such as location, amenities, size, and any specific requirements outlined by the customer to ensure a tailored recommendation that aligns with their needs and desires and show its image if possible.",
+        "parameters": custom_json_schema(NoParamsSchema),
+        "runCmd": find_best_property,
+        "isDangerous": False,
+        "functionType": "backend",
+        "isLongRunningTool": False,
+        "rerun": True,
+        "rerunWithDifferentParameters": True
+    },
+
     {
         "name": "summarize_report",
         "description": "Generate a comprehensive summary, no longer than 4000 words, from a lengthy report file. Ensure the summary effectively captures the key findings, insights, recommendations, and all sections present in the report",
