@@ -59,7 +59,7 @@ class RealEstateAnalysisTool:
 
         return property_type_counts
     
-    def generate_market_report(self):
+    def average_price_per_property_type(self):
     
         property_type_avg_price = {}
 
@@ -88,16 +88,20 @@ class RealEstateAnalysisTool:
         return insights
 
 
-# scraped_data = scrape_dovec_website()
+scraped_data = scrape_dovec_website()
 
 # # Use the RealEstateAnalysisTool with the scraped data if scraped_data is not NULL
-# if scraped_data:
-#     # Initialize the RealEstateAnalysisTool with the scraped data
-#     analysis_tool = RealEstateAnalysisTool(scraped_data)
+if scraped_data:
+    # Initialize the RealEstateAnalysisTool with the scraped data
+    analysis_tool = RealEstateAnalysisTool(scraped_data)
 
-#     # Example usage
-#     average_price = analysis_tool.average_price_per_square_meter()
-#     print("Average price per square meter:", average_price)
+    # Example usage
+    average_price = analysis_tool.average_price_per_square_meter()
+    print("Average price per square meter:", average_price)
 
-#     property_type_counts = analysis_tool.property_type_distribution()
-#     print("Property type distribution:", property_type_counts)
+    property_type_counts = analysis_tool.property_type_distribution()
+    print("Property type distribution:", property_type_counts)
+
+    average_price_per_property_type = analysis_tool.average_price_per_property_type()
+    print("Average Price Per Property type:", average_price_per_property_type)
+
