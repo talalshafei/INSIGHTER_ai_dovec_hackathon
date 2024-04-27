@@ -1,13 +1,14 @@
 from pydantic import BaseModel, Field
 from web_scaping_dovec_2 import scrape_dovec_website
 from web_scrapping_dogankent import scrape_dogankent_website
-from RealEstateAnalysisTool import RealEstateAnalysisTool
 import pandas as pd
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-
+import os
+from dotenv import load_dotenv
 ############# Dummy Tools ##############################
+load_dotenv()
 
 
 class NoParamsSchema(BaseModel):
@@ -23,37 +24,63 @@ class SendEmail(BaseModel):
     customized_response: list[str] = Field(..., title="Email", description="Response required")
 
 
+def file_reader(filePath: str):
+    try:
+        with open(filePath, 'r') as file:
+            return file.read()
+    except Exception as e:
+        return str(e)
+
+
 def find_best_property():
     dovec_scraped_data = scrape_dovec_website()[:5]
     return dovec_scraped_data
 
 
-def email_customer(email: str, customized_response: str):
+def suggest_response_customer():
+    file = pd.read_excel('sample_customer_data.xlsx')
+    # get response from our server
+    return file.to_json()
+
+
+def email_customer(emails: list[str], customized_responses: list[str]):
     # Email configuration
-    sender_email = 'your_email@example.com'
-    sender_password = 'your_email_password'
-    smtp_server = 'smtp.example.com'
-    smtp_port = 587
+    sender_email = os.getenv('EMAIL')
+    sender_password = os.getenv('PASSWORD')
+    server = smtplib.SMTP("smtp.gmail.com", 587)
+    port = 587
 
-    # Create message
-    msg = MIMEMultipart()
-    msg['From'] = sender_email
-    msg['To'] = email
-    msg['Subject'] = 'Regarding Your High-Priority Complaint'
+    server.starttls()
 
-    body = customized_response
-    # Attach message body
-    msg.attach(MIMEText(body, 'plain'))
+    server.login(sender_email, sender_password)
 
-    # Send email
-    with smtplib.SMTP(smtp_server, smtp_port) as server:
-        server.starttls()
-        server.login(sender_email, sender_password)
-        server.sendmail(sender_email, email, msg.as_string())
+    # Check if the number of emails matches the number of customized responses
+    if len(emails) != len(customized_responses):
+        raise ValueError("Number of emails and customized responses must match")
+
+    # Loop through each email and customized response
+    for email, customized_response in zip(emails, customized_responses):
+        # Create message
+        msg = MIMEMultipart()
+        msg['From'] = sender_email
+        msg['To'] = email
+        msg['Subject'] = 'Regarding Your High-Priority Complaint'
+
+        # Attach customized response as message body
+        body = customized_response
+        msg.attach(MIMEText(body, 'plain'))
+
+        # Send email
+        with smtplib.SMTP(server, port) as server:
+            server.starttls()
+            server.login(sender_email, sender_password)
+            server.sendmail(sender_email, email, msg.as_string())
 
 
 def market_analysis():
-    dovec_data = scrape_dovec_website()
+    dovec_data = scrape_dovec_website()[:5]
+    other_data = scrape_dogankent_website()[:5]
+
     dovecDataFrame = pd.DataFrame(dovec_data)
     dovec_data_json = dovecDataFrame.to_json(orient='records')
     dovec_analysis_tool = RealEstateAnalysisTool(dovec_data)
@@ -128,13 +155,13 @@ tools = [
     },
 
     {
-        "name": "market_analysis",
-        "description": "Conduct a thorough analysis of prevailing market trends within the real estate sector, leveraging data sourced from the Dovec website as well as other reputable platforms. Evaluate key metrics including average metric property prices, average price per square meter, regional variations, and pertinent market indicators. Provide nuanced insights into market conditions, highlighting emerging patterns, potential investment opportunities, and any significant factors shaping the current landscape. Your analysis should offer a comprehensive overview, empowering stakeholders with actionable intelligence to make informed decisions within the dynamic real estate market, be aware the data is structured in a json that has two keys one for Dovec and one for their competitors and it contains full data and other statistics",
+        "name": "suggest_response_customer",
+        "description": "Suggest a response to all the customers based on their previous responses that you read from the file data",
         "parameters": custom_json_schema(NoParamsSchema),
-        "runCmd": market_analysis,
+        "runCmd": suggest_response_customer,
         "isDangerous": False,
         "functionType": "backend",
-        "isLongRunningTool": True,
+        "isLongRunningTool": False,
         "rerun": True,
         "rerunWithDifferentParameters": True
     },
@@ -142,11 +169,11 @@ tools = [
         "name": "analyze_complaints",
         "description": "Analyze the complaints and give general feedback to the business based on them, and feedback on each property based on the complaints about it and the count of complaints.",
         "parameters": custom_json_schema(NoParamsSchema),
-        "runCmd": analyze_complaints,
+        "runCmd": market_analysis,
         "isDangerous": False,
         "functionType": "backend",
         "isLongRunningTool": False,
         "rerun": True,
         "rerunWithDifferentParameters": True
-    },
+    }
 ]
