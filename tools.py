@@ -3,7 +3,9 @@ from web_scaping_dovec_2 import scrape_dovec_website
 from web_scrapping_dogankent import scrape_dogankent_website
 from RealEstateAnalysisTool import RealEstateAnalysisTool
 import pandas as pd
-from flask import jsonify
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 ############# Dummy Tools ##############################
 
@@ -12,13 +14,56 @@ class NoParamsSchema(BaseModel):
     pass
 
 
-# class FilePathSchema(BaseModel):
-#     filePath: str = Field(..., title="Filepath", description="File path required")
+class FilePathSchema(BaseModel):
+    filePath: str = Field(..., title="Filepath", description="File path required")
+
+
+class SendEmail(BaseModel):
+    email: list[str] = Field(..., title="Email", description="Email address required")
+    customized_response: list[str] = Field(..., title="Email", description="Response required")
+
+
+def file_reader(filePath: str):
+    try:
+        with open(filePath, 'r') as file:
+            return file.read()
+    except Exception as e:
+        return str(e)
 
 
 def find_best_property():
     dovec_scraped_data = scrape_dovec_website()[:5]
     return dovec_scraped_data
+
+
+def suggest_response_customer():
+    file = pd.read_excel('sample_customer_data.xlsx')
+    # get response from our server
+    return file.to_json()
+
+
+def email_customer(email: str, customized_response: str):
+    # Email configuration
+    sender_email = 'your_email@example.com'
+    sender_password = 'your_email_password'
+    smtp_server = 'smtp.example.com'
+    smtp_port = 587
+
+    # Create message
+    msg = MIMEMultipart()
+    msg['From'] = sender_email
+    msg['To'] = email
+    msg['Subject'] = 'Regarding Your High-Priority Complaint'
+
+    body = customized_response
+    # Attach message body
+    msg.attach(MIMEText(body, 'plain'))
+
+    # Send email
+    with smtplib.SMTP(smtp_server, smtp_port) as server:
+        server.starttls()
+        server.login(sender_email, sender_password)
+        server.sendmail(sender_email, email, msg.as_string())
 
 
 def market_analysis():
