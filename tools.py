@@ -1,7 +1,9 @@
 from pydantic import BaseModel, Field
 from web_scaping_dovec_2 import scrape_dovec_website
 from web_scrapping_dogankent import scrape_dogankent_website
+from RealEstateAnalysisTool import RealEstateAnalysisTool
 import pandas as pd
+from flask import jsonify
 
 ############# Dummy Tools ##############################
 
@@ -10,16 +12,8 @@ class NoParamsSchema(BaseModel):
     pass
 
 
-class FilePathSchema(BaseModel):
-    filePath: str = Field(..., title="Filepath", description="File path required")
-
-
-def file_reader(filePath: str):
-    try:
-        with open(filePath, 'r') as file:
-            return file.read()
-    except Exception as e:
-        return str(e)
+# class FilePathSchema(BaseModel):
+#     filePath: str = Field(..., title="Filepath", description="File path required")
 
 
 def find_best_property():
@@ -27,26 +21,35 @@ def find_best_property():
     return dovec_scraped_data
 
 
-def suggest_response_customer():
-    file = pd.read_excel('sample_customer_data.xlsx')
-    # get response from our server
-    return file.to_json()
-
-
-def classify_response(response: str):
-    pass
-
-
 def market_analysis():
-    dovec_data = scrape_dovec_website()[:5]
-    other_data = scrape_dogankent_website()[:5]
-
+    dovec_data = scrape_dovec_website()
     dovecDataFrame = pd.DataFrame(dovec_data)
-    dovec_data = dovecDataFrame.to_json(orient='records')
-    otherDataFrame = pd.DataFrame(other_data)
-    other_data = otherDataFrame.to_json(orient='records')
+    dovec_data_json = dovecDataFrame.to_json(orient='records')
+    dovec_analysis_tool = RealEstateAnalysisTool(dovec_data)
+    dovec_average_price = dovec_analysis_tool.average_price_per_square_meter()
+    dovec_property_type = dovec_analysis_tool.property_type_distribution()
 
-    return {"dovec_data": dovec_data, "other_data": other_data}
+    # other_data = scrape_dogankent_website()
+    # otherDataFrame = pd.DataFrame(other_data)
+    # other_data_json = otherDataFrame.to_json(orient='records')
+    # other_analysis_tool = RealEstateAnalysisTool(other_data)
+    # other_average_price = other_analysis_tool.average_price_per_square_meter()
+    # other_property_type = other_analysis_tool.property_type_distribution()
+
+    response = {
+        "dovec": {
+            # "data": dovec_data_json,
+            "average_price": dovec_average_price,
+            "property_type": dovec_property_type
+        },
+        # "other_data": {
+        #     "data": other_data_json,
+        #     "average_price": other_average_price,
+        #     "property_type": other_property_type,
+        # }
+    }
+
+    return response
 
 
 def custom_json_schema(model):
@@ -80,24 +83,13 @@ tools = [
     },
 
     {
-        "name": "suggest_response_customer",
-        "description": "Suggest a response to all the customers based on their previous responses that you read from the file data",
-        "parameters": custom_json_schema(NoParamsSchema),
-        "runCmd": suggest_response_customer,
-        "isDangerous": False,
-        "functionType": "backend",
-        "isLongRunningTool": False,
-        "rerun": True,
-        "rerunWithDifferentParameters": True
-    },
-    {
         "name": "market_analysis",
-        "description": "Conduct a thorough analysis of prevailing market trends within the real estate sector, leveraging data sourced from the Dovec website as well as other reputable platforms. Evaluate key metrics including average property prices, demand-supply dynamics, regional variations, and pertinent market indicators. Provide nuanced insights into market conditions, highlighting emerging patterns, potential investment opportunities, and any significant factors shaping the current landscape. Your analysis should offer a comprehensive overview, empowering stakeholders with actionable intelligence to make informed decisions within the dynamic real estate market, be aware the data is structured in a json that has two keys and each key's values is a table",
+        "description": "Conduct a thorough analysis of prevailing market trends within the real estate sector, leveraging data sourced from the Dovec website as well as other reputable platforms. Evaluate key metrics including average metric property prices, average price per square meter, regional variations, and pertinent market indicators. Provide nuanced insights into market conditions, highlighting emerging patterns, potential investment opportunities, and any significant factors shaping the current landscape. Your analysis should offer a comprehensive overview, empowering stakeholders with actionable intelligence to make informed decisions within the dynamic real estate market, be aware the data is structured in a json that has two keys one for Dovec and one for their competitors and it contains full data and other statistics",
         "parameters": custom_json_schema(NoParamsSchema),
         "runCmd": market_analysis,
         "isDangerous": False,
         "functionType": "backend",
-        "isLongRunningTool": False,
+        "isLongRunningTool": True,
         "rerun": True,
         "rerunWithDifferentParameters": True
     }
