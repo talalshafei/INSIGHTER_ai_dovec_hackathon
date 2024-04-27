@@ -33,6 +33,12 @@ def find_best_property():
     dovec_scraped_data = scrape_dovec_website()
     return dovec_scraped_data
 
+def suggest_response_customer(filepath: str):
+    try:
+        reponse = file_reader(filepath)
+    except Exception as e:
+        reponse = str(e)
+    return reponse
 
 # def market_analysis():
 #     dovec_data = scrape_dovec_website()
@@ -69,6 +75,18 @@ tools = [
         "rerun": True,
         "rerunWithDifferentParameters": True
     },
+
+    {
+        "name": "suggest_response_customer",
+        "description": "Suggest a response to a customer based on their previous responses that you read from the file data",
+        "parameters": custom_json_schema(SuggestResponseCustomer),
+        "runCmd": suggest_response_customer,
+        "isDangerous": False,
+        "functionType": "backend",
+        "isLongRunningTool": False,
+        "rerun": True,
+        "rerunWithDifferentParameters": True
+    }
 
     # {
     #     "name": "market_analysis",
