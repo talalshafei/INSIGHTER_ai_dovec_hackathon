@@ -1,9 +1,3 @@
-from web_scaping_dovec_2 import scrape_dovec_website
-# import seaborn as sns
-import numpy as np
-# import matplotlib.pyplot as plt
-
-
 class RealEstateAnalysisTool:
     def __init__(self, property_data):
         self.property_data = property_data
@@ -82,20 +76,28 @@ class RealEstateAnalysisTool:
             avg_price_per_sqm = sum(avg_prices) / len(avg_prices)
             insights[property_type] = avg_price_per_sqm
 
+    def average_price_per_property_type(self):
+
+        property_type_avg_price = {}
+
+        for property_info in self.property_data:
+            property_type = property_info.get("Property Type")
+            price = property_info.get("Price")
+            square_meter = property_info.get("Square Meter")
+
+            if property_type and price and square_meter:
+                price_per_square_meter = int(price) / int(square_meter)
+
+                if property_type in property_type_avg_price:
+                    property_type_avg_price[property_type].append(price_per_square_meter)
+                else:
+                    property_type_avg_price[property_type] = [price_per_square_meter]
+
+        # Compile insights
+        insights = {}
+        for property_type, avg_prices in property_type_avg_price.items():
+            avg_price_per_sqm = sum(avg_prices) / len(avg_prices)
+            insights[property_type] = avg_price_per_sqm
+
         # Return insights
         return insights
-
-
-scraped_data = scrape_dovec_website()
-
-# Use the RealEstateAnalysisTool with the scraped data if scraped_data is not NULL
-if scraped_data:
-    # Initialize the RealEstateAnalysisTool with the scraped data
-    analysis_tool = RealEstateAnalysisTool(property_data=scraped_data)
-
-    # Example usage
-    average_price = analysis_tool.average_price_per_square_meter()
-    print("Average price per square meter:", average_price)
-
-    property_type_counts = analysis_tool.property_type_distribution()
-    print("Property type distribution:", property_type_counts)

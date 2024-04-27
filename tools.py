@@ -8,7 +8,8 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import os
 from dotenv import load_dotenv
-############# Dummy Tools ##############################
+
+
 load_dotenv()
 
 
@@ -20,7 +21,7 @@ class FilePathSchema(BaseModel):
     filePath: str = Field(..., title="Filepath", description="File path required")
 
 
-class SendEmail(BaseModel):
+class SendEmailSchema(BaseModel):
     email: list[str] = Field(..., title="Email", description="Email address required")
     customized_response: list[str] = Field(..., title="Email", description="Response required")
 
@@ -32,11 +33,12 @@ def find_best_property():
 
 def email_customer(emails: list[str], customized_responses: list[str]):
     # Email configuration
+
+    port = 587
     sender_email = os.getenv('EMAIL')
     sender_password = os.getenv('PASSWORD')
     server = smtplib.SMTP("smtp.gmail.com", 587)
-    port = 587
-
+    server.ehlo()
     server.starttls()
 
     server.login(sender_email, sender_password)
@@ -48,20 +50,19 @@ def email_customer(emails: list[str], customized_responses: list[str]):
     # Loop through each email and customized response
     for email, customized_response in zip(emails, customized_responses):
         # Create message
-        msg = MIMEMultipart()
+        msg = MIMEMultipart("alternative")
         msg['From'] = sender_email
         msg['To'] = email
-        msg['Subject'] = 'Regarding Your High-Priority Complaint'
+        msg['Subject'] = 'Regarding Your Complaint'
 
         # Attach customized response as message body
         body = customized_response
         msg.attach(MIMEText(body, 'plain'))
 
         # Send email
-        with smtplib.SMTP(server, port) as server:
-            server.starttls()
-            server.login(sender_email, sender_password)
-            server.sendmail(sender_email, email, msg.as_string())
+        server.sendmail(sender_email, email, msg.as_string())
+
+    server.quit()
 
 
 def market_analysis():
@@ -114,7 +115,7 @@ def custom_json_schema(model):
 tools = [
     {
         "name": "find_best_property",
-        "description": "Given the customer's preferences and budget constraints, analyze the provided prompt and utilize the data returned from the function to recommend the most suitable property. Consider factors such as location, amenities, size, and any specific requirements outlined by the customer to ensure a tailored recommendation that aligns with their needs and desires and show its image if possible and the map too.",
+        "description": "Given the customer's preferences and budget constraints, analyze the provided prompt and utilize the data returned from the function to recommend the most suitable property. Consider factors such as location, amenities, size, and any specific requirements outlined by the customer to ensure a tailored recommendation that aligns with their needs and desires and show property image if possible and location on map too.",
         "parameters": custom_json_schema(NoParamsSchema),
         "runCmd": find_best_property,
         "isDangerous": False,
@@ -135,10 +136,10 @@ tools = [
         "rerunWithDifferentParameters": True
     },
     {
-        "name": "analyze_complaints",
-        "description": "Analyze the complaints and give general feedback to the business based on them, and feedback on each property based on the complaints about it and the count of complaints.",
-        "parameters": custom_json_schema(NoParamsSchema),
-        "runCmd": analyze_complaints,
+        "name": "email_customer",
+        "description": "Send customized emails to the list of customers",
+        "parameters": custom_json_schema(SendEmailSchema),
+        "runCmd": email_customer,
         "isDangerous": False,
         "functionType": "backend",
         "isLongRunningTool": False,
