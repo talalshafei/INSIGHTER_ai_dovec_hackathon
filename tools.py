@@ -37,7 +37,7 @@ def email_customer(emails: list[str], customized_responses: list[str]):
     port = 587
     sender_email = "noorulzayn10@gmail.com"
     sender_password = "bxui jote surb gxde"
-    server = smtplib.SMTP("smtp.gmail.com", 587)
+    server = smtplib.SMTP("smtp.gmail.com", port)
     server.ehlo()
     server.starttls()
 
@@ -137,7 +137,7 @@ tools = [
     },
     {
         "name": "email_customer",
-        "description": "Send customized emails to the list of customers",
+        "description": "Send the customized responses to the customer's email address. The email will be extracted from the previous input.",
         "parameters": custom_json_schema(SendEmailSchema),
         "runCmd": email_customer,
         "isDangerous": False,
