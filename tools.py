@@ -87,7 +87,7 @@ tools = [
     {
         "name": "suggest_response_customer",
         "description": "Suggest a response to all the customers based on their previous responses that you read from the file data",
-        "parameters": custom_json_schema(SuggestResponseCustomer),
+        "parameters": custom_json_schema(SuggestResponseCustomerSchema),
         "runCmd": suggest_response_customer,
         "isDangerous": False,
         "functionType": "backend",
