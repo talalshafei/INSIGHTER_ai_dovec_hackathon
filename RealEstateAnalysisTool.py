@@ -3,6 +3,7 @@ import seaborn as sns
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 class RealEstateAnalysisTool:
     def __init__(self, property_data):
         self.property_data = property_data
@@ -45,7 +46,7 @@ class RealEstateAnalysisTool:
                 average_price_per_location[location] = None
 
         return average_price_per_location
-    
+
     def property_type_distribution(self):
         property_type_counts = {}
 
@@ -55,7 +56,7 @@ class RealEstateAnalysisTool:
                 property_type_counts[property_type] += 1
             else:
                 property_type_counts[property_type] = 1
-        
+
         return property_type_counts
     
     def generate_market_report(self):
@@ -86,21 +87,17 @@ class RealEstateAnalysisTool:
         # Return insights
         return insights
 
-    
 
-scraped_data = scrape_dovec_website()
+# scraped_data = scrape_dovec_website()
 
-# Use the RealEstateAnalysisTool with the scraped data if scraped_data is not NULL
-if scraped_data:
-    # Initialize the RealEstateAnalysisTool with the scraped data
-    analysis_tool = RealEstateAnalysisTool(scraped_data)
+# # Use the RealEstateAnalysisTool with the scraped data if scraped_data is not NULL
+# if scraped_data:
+#     # Initialize the RealEstateAnalysisTool with the scraped data
+#     analysis_tool = RealEstateAnalysisTool(scraped_data)
 
-    # Example usage
-    average_price = analysis_tool.average_price_per_square_meter()
-    print("Average price per square meter:", average_price)
+#     # Example usage
+#     average_price = analysis_tool.average_price_per_square_meter()
+#     print("Average price per square meter:", average_price)
 
-    property_type_counts = analysis_tool.property_type_distribution()
-    print("Property type distribution:", property_type_counts)
-
-    property_insight = analysis_tool.generate_market_report()
-    print("Average price per Square meter for each property type:", property_insight)
+#     property_type_counts = analysis_tool.property_type_distribution()
+#     print("Property type distribution:", property_type_counts)

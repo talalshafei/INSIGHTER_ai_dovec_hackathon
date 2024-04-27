@@ -2,9 +2,13 @@ from pydantic import BaseModel, Field
 from web_scaping_dovec_2 import scrape_dovec_website
 from web_scrapping_dogankent import scrape_dogankent_website
 import pandas as pd
-
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+import os
+from dotenv import load_dotenv
 ############# Dummy Tools ##############################
-
+load_dotenv()
 
 class NoParamsSchema(BaseModel):
     pass
@@ -13,6 +17,9 @@ class NoParamsSchema(BaseModel):
 class FilePathSchema(BaseModel):
     filePath: str = Field(..., title="Filepath", description="File path required")
 
+class SendEmail(BaseModel):
+    email: list[str] = Field(..., title="Email", description="Email address required")
+    customized_response: list[str] = Field(..., title="Email", description="Response required") 
 
 def file_reader(filePath: str):
     try:
@@ -32,9 +39,38 @@ def suggest_response_customer():
     # get response from our server
     return file.to_json()
 
+def email_customer(emails: list[str], customized_responses: list[str]):
+    # Email configuration
+    sender_email = os.getenv('EMAIL')
+    sender_password = os.getenv('PASSWORD')
+    server = smtplib.SMTP("smtp.gmail.com", 587)
+    port = 587
 
-def classify_response(response: str):
-    pass
+    server.starttls()
+
+    server.login(sender_email, sender_password)
+
+    # Check if the number of emails matches the number of customized responses
+    if len(emails) != len(customized_responses):
+        raise ValueError("Number of emails and customized responses must match")
+
+    # Loop through each email and customized response
+    for email, customized_response in zip(emails, customized_responses):
+        # Create message
+        msg = MIMEMultipart()
+        msg['From'] = sender_email
+        msg['To'] = email
+        msg['Subject'] = 'Regarding Your High-Priority Complaint'
+
+        # Attach customized response as message body
+        body = customized_response
+        msg.attach(MIMEText(body, 'plain'))
+
+        # Send email
+        with smtplib.SMTP(server, port) as server:
+            server.starttls()
+            server.login(sender_email, sender_password)
+            server.sendmail(sender_email, email, msg.as_string())
 
 
 def market_analysis():
