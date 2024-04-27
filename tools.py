@@ -25,10 +25,31 @@ class SendEmailSchema(BaseModel):
     email: list[str] = Field(..., title="Email", description="Email address required")
     customized_response: list[str] = Field(..., title="Email", description="Response required")
 
+def filter_property_data(prompt, data):
+    keywords = prompt.lower().split()
+    filtered_properties = []
+    for property in data:
+        if all(keyword in property['Location'].lower() or
+               keyword in property['property_details'].lower() or
+               keyword in property['Property Type'].lower() for keyword in keywords):
+            filtered_properties.append({
+                "Name": property["Name"],
+                "Location": property["Location"],
+                "Price": property["Price"],
+                "currency": property["currency"],
+                "Square Meter": property["Square Meter"],
+                "Property Type": property["Property Type"],
+                "image": property["image"]
+            })
+    return filtered_properties
 
-def find_best_property():
-    dovec_scraped_data = scrape_dovec_website()[:5]
-    return dovec_scraped_data
+def find_best_property(prompt):
+    #dovec_scraped_data = scrape_dovec_website()
+    #return dovec_scraped_data
+    dovec_scraped_data = scrape_dovec_website()
+    filtered_properties = filter_property_data(prompt, dovec_scraped_data)
+    
+    return filtered_properties
 
 
 def email_customer(emails: list[str], customized_responses: list[str]):
