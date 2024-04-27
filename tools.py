@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field
-# from web_scraping_dovec import scrape_dovec_website_save
 from web_scaping_dovec_2 import scrape_dovec_website
+from web_scrapping_dogankent import scrape_dogankent_website
+import pandas as pd
 
 ############# Dummy Tools ##############################
 
@@ -42,10 +43,16 @@ def classify_response(response: str):
     pass
 
 
-# def market_analysis():
-#     dovec_data = scrape_dovec_website()
-#     # other_data = scrape_other_website()
-#     return {"dovec_data": dovec_data, "other_data": other_data}
+def market_analysis():
+    dovec_data = scrape_dovec_website()[:5]
+    other_data = scrape_dogankent_website()[:5]
+
+    dovecDataFrame = pd.DataFrame(dovec_data)
+    dovec_data = dovecDataFrame.to_json(orient='records')
+    otherDataFrame = pd.DataFrame(other_data)
+    other_data = otherDataFrame.to_json(orient='records')
+
+    return {"dovec_data": dovec_data, "other_data": other_data}
 
 
 def custom_json_schema(model):
@@ -88,18 +95,16 @@ tools = [
         "isLongRunningTool": False,
         "rerun": True,
         "rerunWithDifferentParameters": True
+    },
+    {
+        "name": "market_analysis",
+        "description": "Conduct a thorough analysis of prevailing market trends within the real estate sector, leveraging data sourced from the Dovec website as well as other reputable platforms. Evaluate key metrics including average property prices, demand-supply dynamics, regional variations, and pertinent market indicators. Provide nuanced insights into market conditions, highlighting emerging patterns, potential investment opportunities, and any significant factors shaping the current landscape. Your analysis should offer a comprehensive overview, empowering stakeholders with actionable intelligence to make informed decisions within the dynamic real estate market, be aware the data is structured in a json that has two keys and each key's values is a table",
+        "parameters": custom_json_schema(NoParamsSchema),
+        "runCmd": market_analysis,
+        "isDangerous": False,
+        "functionType": "backend",
+        "isLongRunningTool": False,
+        "rerun": True,
+        "rerunWithDifferentParameters": True
     }
-
-    # {
-    #     "name": "market_analysis",
-    #     "description": "Conduct a thorough analysis of prevailing market trends within the real estate sector, leveraging data sourced from the Dovec website as well as other reputable platforms. Evaluate key metrics including average property prices, demand-supply dynamics, regional variations, and pertinent market indicators. Provide nuanced insights into market conditions, highlighting emerging patterns, potential investment opportunities, and any significant factors shaping the current landscape. Your analysis should offer a comprehensive overview, empowering stakeholders with actionable intelligence to make informed decisions within the dynamic real estate market",
-    #     "parameters": custom_json_schema(NoParamsSchema),
-    #     "runCmd": market_analysis,
-    #     "isDangerous": False,
-    #     "functionType": "backend",
-    #     "isLongRunningTool": False,
-    #     "rerun": True,
-    #     "rerunWithDifferentParameters": True
-    # }
-
 ]
