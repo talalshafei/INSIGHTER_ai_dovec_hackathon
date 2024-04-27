@@ -86,7 +86,15 @@ def market_analysis():
 def analyze_complaints():
     # get data from our server
     df = pd.read_excel('complaints.xlsx')
-    return df.to_json()
+    # perform analysis
+    complaint_counts = df.groupby('prop_id')['complaints'].count().reset_index()
+
+    complaint_counts.rename(columns={'complaint': 'complaint_count'}, inplace=True)
+
+    return {
+        "complaints": df.to_json(orient='records'),
+        "complaint_counts": complaint_counts.to_json(orient='records')
+    }
 
 
 def custom_json_schema(model):
@@ -132,7 +140,7 @@ tools = [
     },
     {
         "name": "analyze_complaints",
-        "description": "Analyze the complaints data to identify key trends, patterns, and insights. Utilize data visualization techniques to present the findings in a clear and compelling manner, enabling stakeholders to gain a deeper understanding of the underlying issues. Your analysis should highlight common themes, recurring problems, and potential areas for improvement, providing valuable insights to inform decision-making and drive positive change.",
+        "description": "Analyze the complaints and give general feedback to the business based on them, and feedback on each property based on the complaints about it and the count of complaints.",
         "parameters": custom_json_schema(NoParamsSchema),
         "runCmd": analyze_complaints,
         "isDangerous": False,
