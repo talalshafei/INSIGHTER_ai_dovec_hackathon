@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+import pandas as pd
 # from web_scraping_dovec import scrape_dovec_website_save
 from web_scaping_dovec_2 import scrape_dovec_website
 
@@ -10,9 +11,6 @@ class NoParamsSchema(BaseModel):
 
 class FilePathSchema(BaseModel):
     filePath: str = Field(..., title="Filepath", description="File path required")
-
-class SuggestResponseCustomerSchema(BaseModel):
-   pass
 
 def file_reader(filePath: str):
     try:
@@ -27,11 +25,10 @@ def find_best_property():
     return dovec_scraped_data
 
 def suggest_response_customer():
-    try:
-        data = file_reader("C:\Users\admin\Desktop\New folder\dovec_hackathon\sample_customer_data.xlsx")
-    except Exception as e:
-        data = str(e)
-    return data
+    file = pd.read_excel('sample_customer_data.xlsx')
+    # get response from our server
+    return file
+    
 
 def classify_response(response: str):
     pass
@@ -77,7 +74,7 @@ tools = [
     {
         "name": "suggest_response_customer",
         "description": "Suggest a response to all the customers based on their previous responses that you read from the file data",
-        "parameters": custom_json_schema(SuggestResponseCustomerSchema),
+        "parameters": custom_json_schema(NoParamsSchema),
         "runCmd": suggest_response_customer,
         "isDangerous": False,
         "functionType": "backend",
