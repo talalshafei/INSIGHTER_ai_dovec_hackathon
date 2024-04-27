@@ -22,14 +22,6 @@ def file_reader(filePath: str):
         return str(e)
 
 
-def summarize_report_based_on_role(reportPath: str, role: str):
-    try:
-        with open(reportPath, 'r') as reportFile:
-            return {"role": role, "report": reportFile.read()}
-    except Exception as e:
-        return str(e)
-
-
 def find_best_property():
     dovec_scraped_data = scrape_dovec_website()
     return dovec_scraped_data

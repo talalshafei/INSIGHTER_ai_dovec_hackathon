@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify, abort
 from flask_cors import CORS
 # from dotenv import load_dotenv
-from tools import tools, product_finder, file_reader
+from tools import tools
 
 app = Flask(__name__)
 CORS(app)
