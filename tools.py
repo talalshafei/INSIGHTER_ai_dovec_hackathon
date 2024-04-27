@@ -23,7 +23,7 @@ class FilePathSchema(BaseModel):
 
 class SendEmailSchema(BaseModel):
     # email: list[str] = Field(..., title="Email", description="Email address required")
-    customized_responses: list[str] = Field(..., title="Customized Responses", description="Customized Responses required")
+    customized_responses: str = Field(..., title="Customized Responses", description="Customized Responses required")
 
 
 def find_best_property():
@@ -31,9 +31,10 @@ def find_best_property():
     return dovec_scraped_data
 
 
-def email_customers(customized_responses: list[str]):
+def email_customers(customized_responses: str):
     # Email configuration
-    emails = ["noorulzayn10@gmail.com"] * 14
+    print("Sending email")
+    email = "noorulzayn10@gmail.com"
     port = 587
     sender_email = "noorulzayn10@gmail.com"
     sender_password = "bxui jote surb gxde"
@@ -43,24 +44,24 @@ def email_customers(customized_responses: list[str]):
 
     server.login(sender_email, sender_password)
 
-    # Check if the number of emails matches the number of customized responses
-    if len(emails) != len(customized_responses):
-        raise ValueError("Number of emails and customized responses must match")
+    # # Check if the number of emails matches the number of customized responses
+    # if len(emails) != len(customized_responses):
+    #     raise ValueError("Number of emails and customized responses must match")
 
     # Loop through each email and customized response
-    for email, customized_response in zip(emails, customized_responses):
-        # Create message
-        msg = MIMEMultipart("alternative")
-        msg['From'] = sender_email
-        msg['To'] = email
-        msg['Subject'] = 'Regarding Your Complaint'
+    # for email in zip(emails, customized_responses):
+    # Create message
+    msg = MIMEMultipart("alternative")
+    msg['From'] = sender_email
+    msg['To'] = email
+    msg['Subject'] = 'Regarding Your Complaint'
 
-        # Attach customized response as message body
-        body = customized_response
-        msg.attach(MIMEText(body, 'plain'))
+    # Attach customized response as message body
+    body = customized_responses
+    msg.attach(MIMEText(body, 'plain'))
 
-        # Send email
-        server.sendmail(sender_email, email, msg.as_string())
+    # Send email
+    server.sendmail(sender_email, email, msg.as_string())
 
     server.quit()
     return "success"
