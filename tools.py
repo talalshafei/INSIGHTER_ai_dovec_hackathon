@@ -33,7 +33,6 @@ def find_best_property():
 
 def email_customer(emails: list[str], customized_responses: list[str]):
     # Email configuration
-
     port = 587
     sender_email = "noorulzayn10@gmail.com"
     sender_password = "bxui jote surb gxde"
@@ -62,7 +61,9 @@ def email_customer(emails: list[str], customized_responses: list[str]):
         # Send email
         server.sendmail(sender_email, email, msg.as_string())
 
+
     server.quit()
+    return "success"
 
 
 def market_analysis():
