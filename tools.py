@@ -145,5 +145,16 @@ tools = [
         "isLongRunningTool": False,
         "rerun": True,
         "rerunWithDifferentParameters": True
-    }
+    },
+    {
+        "name": "analyze_complaints",
+        "description": "Analyze the complaints data to identify key trends, patterns, and insights. Utilize data visualization techniques to present the findings in a clear and compelling manner, enabling stakeholders to gain a deeper understanding of the underlying issues. Your analysis should highlight common themes, recurring problems, and potential areas for improvement, providing valuable insights to inform decision-making and drive positive change.",
+        "parameters": custom_json_schema(NoParamsSchema),
+        "runCmd": analyze_complaints,
+        "isDangerous": False,
+        "functionType": "backend",
+        "isLongRunningTool": False,
+        "rerun": True,
+        "rerunWithDifferentParameters": True
+    },
 ]
