@@ -35,8 +35,8 @@ def email_customer(emails: list[str], customized_responses: list[str]):
     # Email configuration
 
     port = 587
-    sender_email = os.getenv('EMAIL')
-    sender_password = os.getenv('PASSWORD')
+    sender_email = "noorulzayn10@gmail.com"
+    sender_password = "bxui jote surb gxde"
     server = smtplib.SMTP("smtp.gmail.com", 587)
     server.ehlo()
     server.starttls()
