@@ -7,7 +7,8 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import os
 from dotenv import load_dotenv
-############# Dummy Tools ##############################
+
+
 load_dotenv()
 
 
@@ -18,8 +19,7 @@ class NoParamsSchema(BaseModel):
 class FilePathSchema(BaseModel):
     filePath: str = Field(..., title="Filepath", description="File path required")
 
-
-class SendEmail(BaseModel):
+class SendEmailSchema(BaseModel):
     email: list[str] = Field(..., title="Email", description="Email address required")
     customized_response: list[str] = Field(..., title="Email", description="Response required")
 
@@ -64,7 +64,7 @@ def email_customer(emails: list[str], customized_responses: list[str]):
         msg = MIMEMultipart()
         msg['From'] = sender_email
         msg['To'] = email
-        msg['Subject'] = 'Regarding Your High-Priority Complaint'
+        msg['Subject'] = 'Regarding Your Complaint'
 
         # Attach customized response as message body
         body = customized_response
@@ -170,6 +170,17 @@ tools = [
         "description": "Analyze the complaints and give general feedback to the business based on them, and feedback on each property based on the complaints about it and the count of complaints.",
         "parameters": custom_json_schema(NoParamsSchema),
         "runCmd": market_analysis,
+        "isDangerous": False,
+        "functionType": "backend",
+        "isLongRunningTool": False,
+        "rerun": True,
+        "rerunWithDifferentParameters": True
+    },
+    {
+        "name": "email_customer",
+        "description": "Send customized emails to the list of customers",
+        "parameters": custom_json_schema(SendEmailSchema),
+        "runCmd": email_customer,
         "isDangerous": False,
         "functionType": "backend",
         "isLongRunningTool": False,
