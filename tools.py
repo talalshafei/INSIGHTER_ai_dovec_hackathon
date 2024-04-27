@@ -8,13 +8,11 @@ from web_scaping_dovec_2 import scrape_dovec_website
 class NoParamsSchema(BaseModel):
     pass
 
-
 class FilePathSchema(BaseModel):
     filePath: str = Field(..., title="Filepath", description="File path required")
 
-
 class SuggestResponseCustomerSchema(BaseModel):
-    filePath: str = Field(..., title="Filepath", description="File path required")
+   pass
 
 def file_reader(filePath: str):
     try:
@@ -36,12 +34,12 @@ def find_best_property():
     dovec_scraped_data = scrape_dovec_website()
     return dovec_scraped_data
 
-def suggest_response_customer(filepath: str):
+def suggest_response_customer():
     try:
-        reponse = file_reader(filepath)
+        data = file_reader("C:\Users\admin\Desktop\New folder\dovec_hackathon\sample_customer_data.xlsx")
     except Exception as e:
-        reponse = str(e)
-    return reponse
+        data = str(e)
+    return data
 
 def classify_response(response: str):
     pass
