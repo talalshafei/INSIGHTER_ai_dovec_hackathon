@@ -1,4 +1,7 @@
 from web_scaping_dovec_2 import scrape_dovec_website
+import seaborn as sns
+import numpy as np
+import matplotlib.pyplot as plt
 
 class RealEstateAnalysisTool:
     def __init__(self, property_data):
@@ -54,6 +57,34 @@ class RealEstateAnalysisTool:
                 property_type_counts[property_type] = 1
         
         return property_type_counts
+    
+    def generate_market_report(self):
+    
+        property_type_avg_price = {}
+
+        for property_info in self.property_data:
+            property_type = property_info.get("Property Type")
+            price = property_info.get("Price")
+            square_meter = property_info.get("Square Meter")
+
+            if property_type and price and square_meter:
+                price_per_square_meter = int(price) / int(square_meter)
+
+                if property_type in property_type_avg_price:
+                    property_type_avg_price[property_type].append(price_per_square_meter)
+                else:
+                    property_type_avg_price[property_type] = [price_per_square_meter]
+
+        
+        # Compile insights
+        insights = {}
+        for property_type, avg_prices in property_type_avg_price.items():
+            avg_price_per_sqm = sum(avg_prices) / len(avg_prices)
+            insights[property_type] = avg_price_per_sqm
+
+
+        # Return insights
+        return insights
 
     
 
@@ -70,3 +101,6 @@ if scraped_data:
 
     property_type_counts = analysis_tool.property_type_distribution()
     print("Property type distribution:", property_type_counts)
+
+    property_insight = analysis_tool.generate_market_report()
+    print("Average price per Square meter for each property type:", property_insight)
