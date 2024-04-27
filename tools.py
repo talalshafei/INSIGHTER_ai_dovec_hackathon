@@ -16,6 +16,7 @@ class FilePathSchema(BaseModel):
 class SuggestResponseCustomerSchema(BaseModel):
     filePath: str = Field(..., title="Filepath", description="File path required")
 
+
 def file_reader(filePath: str):
     try:
         with open(filePath, 'r') as file:
@@ -25,8 +26,9 @@ def file_reader(filePath: str):
 
 
 def find_best_property():
-    dovec_scraped_data = scrape_dovec_website()
+    dovec_scraped_data = scrape_dovec_website()[:5]
     return dovec_scraped_data
+
 
 def suggest_response_customer(filepath: str):
     try:
@@ -35,9 +37,9 @@ def suggest_response_customer(filepath: str):
         reponse = str(e)
     return reponse
 
+
 def classify_response(response: str):
     pass
-
 
 
 # def market_analysis():
