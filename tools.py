@@ -1,16 +1,10 @@
 from pydantic import BaseModel, Field
 from RealEstateAnalysisTool import RealEstateAnalysisTool
-from web_scaping_dovec_2 import scrape_dovec_website
-from web_scrapping_dogankent import scrape_dogankent_website
+from web_scaping_dovec import scrape_dovec_website
 import pandas as pd
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-import os
-from dotenv import load_dotenv
-
-
-load_dotenv()
 
 
 class NoParamsSchema(BaseModel):
@@ -22,8 +16,8 @@ class FilePathSchema(BaseModel):
 
 
 class SendEmailSchema(BaseModel):
-    email: list[str] = Field(..., title="Email", description="Email address required")
-    customized_response: list[str] = Field(..., title="Email", description="Response required")
+    emails: str = Field(..., title="Emails", description="Emails required")
+    customized_responses: str = Field(..., title="Customized Responses", description="Customized Responses required")
 
 def filter_property_data(prompt, data):
     keywords = prompt.lower().split()
@@ -52,54 +46,53 @@ def find_best_property(prompt):
     return filtered_properties
 
 
-def email_customer(emails: list[str], customized_responses: list[str]):
-    # Email configuration
+def email_customers(emails: str, customized_responses: str):
+    # emails and customized_responses must be converted to lists
+    emails_list = emails.split("---")
+    responses_list = customized_responses.split("---")
 
+    # Email configuration
     port = 587
     sender_email = "noorulzayn10@gmail.com"
     sender_password = "bxui jote surb gxde"
-    server = smtplib.SMTP("smtp.gmail.com", 587)
+    server = smtplib.SMTP("smtp.gmail.com", port)
     server.ehlo()
     server.starttls()
 
     server.login(sender_email, sender_password)
 
-    # Check if the number of emails matches the number of customized responses
-    if len(emails) != len(customized_responses):
-        raise ValueError("Number of emails and customized responses must match")
-
     # Loop through each email and customized response
-    for email, customized_response in zip(emails, customized_responses):
+    for email, response in zip(emails_list, responses_list):
         # Create message
         msg = MIMEMultipart("alternative")
         msg['From'] = sender_email
         msg['To'] = email
-        msg['Subject'] = 'Regarding Your Complaint'
+        msg['Subject'] = "Apology and Resolution: Addressing Your Recent Concerns"
 
-        # Attach customized response as message body
-        body = customized_response
+    # Attach customized response as message body
+        body = response
         msg.attach(MIMEText(body, 'plain'))
 
-        # Send email
+    # Send email
         server.sendmail(sender_email, email, msg.as_string())
 
     server.quit()
+
+    return "Success"
 
 
 def market_analysis():
     dovec_data = scrape_dovec_website()
     dovec_analysis_tool = RealEstateAnalysisTool(dovec_data)
-    dovec_average_price = dovec_analysis_tool.average_price_per_square_meter()
+    dovec_average_price_per_square_meter = dovec_analysis_tool.average_price_per_square_meter()
     dovec_property_type = dovec_analysis_tool.property_type_distribution()
     dovec_average_price_per_property_type = dovec_analysis_tool.average_price_per_property_type()
 
-    response = {
-        "average_price_per_square_meter": dovec_average_price,
+    return {
+        "average_price_per_square_meter": dovec_average_price_per_square_meter,
         "property_type_distribution": dovec_property_type,
         "average_price_per_property_type": dovec_average_price_per_property_type,
     }
-
-    return response
 
 
 def analyze_complaints():
@@ -152,15 +145,15 @@ tools = [
         "runCmd": market_analysis,
         "isDangerous": False,
         "functionType": "backend",
-        "isLongRunningTool": False,
+        "isLongRunningTool": True,
         "rerun": True,
         "rerunWithDifferentParameters": True
     },
     {
-        "name": "email_customer",
-        "description": "Send customized emails to the list of customers",
-        "parameters": custom_json_schema(SendEmailSchema),
-        "runCmd": email_customer,
+        "name": "analyze_complaints",
+        "description": "Analyze the complaints data to identify key trends, patterns, and insights. Present the findings in a clear and compelling manner, enabling stakeholders to gain a deeper understanding of the underlying issues and rank them based on importance. Your analysis should highlight common themes, recurring problems, and potential areas for improvement, providing valuable insights to inform decision-making and drive positive change. Also make customized responses for solution and apology for each complaint.",
+        "parameters": custom_json_schema(NoParamsSchema),
+        "runCmd": analyze_complaints,
         "isDangerous": False,
         "functionType": "backend",
         "isLongRunningTool": False,
@@ -168,10 +161,10 @@ tools = [
         "rerunWithDifferentParameters": True
     },
     {
-        "name": "analyze_complaints",
-        "description": "Analyze the complaints data to identify key trends, patterns, and insights. Utilize data visualization techniques to present the findings in a clear and compelling manner, enabling stakeholders to gain a deeper understanding of the underlying issues. Your analysis should highlight common themes, recurring problems, and potential areas for improvement, providing valuable insights to inform decision-making and drive positive change.",
-        "parameters": custom_json_schema(NoParamsSchema),
-        "runCmd": analyze_complaints,
+        "name": "email_customers",
+        "description": "Send personalized email responses to customers who have submitted complaints. the function must take parameters: emails and customized responses both of which must be a long string separated by '---'. The function should send an email to each customer with their respective customized response. then return 'Success' if the emails are sent successfully.",
+        "parameters": custom_json_schema(SendEmailSchema),
+        "runCmd": email_customers,
         "isDangerous": False,
         "functionType": "backend",
         "isLongRunningTool": False,
