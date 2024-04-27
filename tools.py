@@ -14,7 +14,7 @@ class FilePathSchema(BaseModel):
 
 
 class SuggestResponseCustomerSchema(BaseModel):
-    filePath: str = Field(..., title="Filepath", description="File path required")
+    pass
 
 
 def file_reader(filePath: str):
@@ -30,12 +30,12 @@ def find_best_property():
     return dovec_scraped_data
 
 
-def suggest_response_customer(filepath: str):
+def suggest_response_customer():
     try:
-        reponse = file_reader(filepath)
+        data = file_reader("sample_customer_data.xlsx")
     except Exception as e:
-        reponse = str(e)
-    return reponse
+        data = str(e)
+    return data
 
 
 def classify_response(response: str):
