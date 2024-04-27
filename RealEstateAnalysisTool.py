@@ -76,28 +76,5 @@ class RealEstateAnalysisTool:
             avg_price_per_sqm = sum(avg_prices) / len(avg_prices)
             insights[property_type] = avg_price_per_sqm
 
-    def average_price_per_property_type(self):
-
-        property_type_avg_price = {}
-
-        for property_info in self.property_data:
-            property_type = property_info.get("Property Type")
-            price = property_info.get("Price")
-            square_meter = property_info.get("Square Meter")
-
-            if property_type and price and square_meter:
-                price_per_square_meter = int(price) / int(square_meter)
-
-                if property_type in property_type_avg_price:
-                    property_type_avg_price[property_type].append(price_per_square_meter)
-                else:
-                    property_type_avg_price[property_type] = [price_per_square_meter]
-
-        # Compile insights
-        insights = {}
-        for property_type, avg_prices in property_type_avg_price.items():
-            avg_price_per_sqm = sum(avg_prices) / len(avg_prices)
-            insights[property_type] = avg_price_per_sqm
-
         # Return insights
         return insights
