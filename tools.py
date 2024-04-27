@@ -13,6 +13,9 @@ class FilePathSchema(BaseModel):
     filePath: str = Field(..., title="Filepath", description="File path required")
 
 
+class SuggestResponseCustomerSchema(BaseModel):
+    filePath: str = Field(..., title="Filepath", description="File path required")
+
 def file_reader(filePath: str):
     try:
         with open(filePath, 'r') as file:
@@ -39,6 +42,11 @@ def suggest_response_customer(filepath: str):
     except Exception as e:
         reponse = str(e)
     return reponse
+
+def classify_response(response: str):
+    pass
+
+
 
 # def market_analysis():
 #     dovec_data = scrape_dovec_website()
@@ -78,7 +86,7 @@ tools = [
 
     {
         "name": "suggest_response_customer",
-        "description": "Suggest a response to a customer based on their previous responses that you read from the file data",
+        "description": "Suggest a response to all the customers based on their previous responses that you read from the file data",
         "parameters": custom_json_schema(SuggestResponseCustomer),
         "runCmd": suggest_response_customer,
         "isDangerous": False,
