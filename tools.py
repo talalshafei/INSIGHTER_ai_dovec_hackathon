@@ -137,7 +137,7 @@ tools = [
         "rerunWithDifferentParameters": True
     },
     {
-        "name": "email_customer",
+        "name": "email_customers",
         "description": "Send the customized responses to the customer's email address.",
         "parameters": custom_json_schema(SendEmailSchema),
         "runCmd": email_customers,
