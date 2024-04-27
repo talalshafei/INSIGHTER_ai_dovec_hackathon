@@ -22,8 +22,8 @@ class FilePathSchema(BaseModel):
 
 
 class SendEmailSchema(BaseModel):
-    email: list[str] = Field(..., title="Email", description="Email address required")
-    customized_response: list[str] = Field(..., title="Email", description="Response required")
+    # email: list[str] = Field(..., title="Email", description="Email address required")
+    customized_responses: list[str] = Field(..., title="Customized Responses", description="Customized Responses required")
 
 
 def find_best_property():
@@ -31,7 +31,7 @@ def find_best_property():
     return dovec_scraped_data
 
 
-def email_customers(customized_responses: list[str]):
+def email_customer(customized_responses: list[str]):
     # Email configuration
     emails = ["noorulzayn10@gmail.com"] * 14
     port = 587
@@ -61,6 +61,7 @@ def email_customers(customized_responses: list[str]):
 
         # Send email
         server.sendmail(sender_email, email, msg.as_string())
+
 
     server.quit()
     return "success"
@@ -137,10 +138,10 @@ tools = [
         "rerunWithDifferentParameters": True
     },
     {
-        "name": "email_customers",
+        "name": "email_customer",
         "description": "Send the customized responses to the customer's email address. The email will be extracted from the previous input.",
         "parameters": custom_json_schema(SendEmailSchema),
-        "runCmd": email_customers,
+        "runCmd": email_customer,
         "isDangerous": False,
         "functionType": "backend",
         "isLongRunningTool": False,
