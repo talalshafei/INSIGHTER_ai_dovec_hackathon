@@ -31,7 +31,7 @@ def find_best_property():
     return dovec_scraped_data
 
 
-def email_customer(customized_responses: list[str]):
+def email_customers(customized_responses: list[str]):
     # Email configuration
     emails = ["noorulzayn10@gmail.com"] * 14
     port = 587
@@ -61,7 +61,6 @@ def email_customer(customized_responses: list[str]):
 
         # Send email
         server.sendmail(sender_email, email, msg.as_string())
-
 
     server.quit()
     return "success"
@@ -139,9 +138,9 @@ tools = [
     },
     {
         "name": "email_customer",
-        "description": "Send the customized responses to the customer's email address. The email will be extracted from the previous input.",
+        "description": "Send the customized responses to the customer's email address.",
         "parameters": custom_json_schema(SendEmailSchema),
-        "runCmd": email_customer,
+        "runCmd": email_customers,
         "isDangerous": False,
         "functionType": "backend",
         "isLongRunningTool": False,
