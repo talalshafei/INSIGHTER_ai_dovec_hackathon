@@ -29,7 +29,7 @@ def find_best_property():
 def suggest_response_customer():
     file = pd.read_excel('sample_customer_data.xlsx')
     # get response from our server
-    return file
+    return file.to_json()
     
 
 
