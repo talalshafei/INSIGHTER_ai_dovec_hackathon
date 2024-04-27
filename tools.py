@@ -31,8 +31,9 @@ def find_best_property():
     return dovec_scraped_data
 
 
-def email_customer(emails: list[str], customized_responses: list[str]):
+def email_customer(customized_responses: list[str]):
     # Email configuration
+    emails = ["noorulzayn10@gmail.com"] * 14
     port = 587
     sender_email = "noorulzayn10@gmail.com"
     sender_password = "bxui jote surb gxde"
