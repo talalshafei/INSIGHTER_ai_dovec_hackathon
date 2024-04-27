@@ -45,11 +45,12 @@ def suggest_response_customer():
 
 def email_customer(emails: list[str], customized_responses: list[str]):
     # Email configuration
+    
+    port = 587
     sender_email = os.getenv('EMAIL')
     sender_password = os.getenv('PASSWORD')
     server = smtplib.SMTP("smtp.gmail.com", 587)
-    port = 587
-
+    server.ehlo()
     server.starttls()
 
     server.login(sender_email, sender_password)
@@ -61,7 +62,7 @@ def email_customer(emails: list[str], customized_responses: list[str]):
     # Loop through each email and customized response
     for email, customized_response in zip(emails, customized_responses):
         # Create message
-        msg = MIMEMultipart()
+        msg = MIMEMultipart("alternative")
         msg['From'] = sender_email
         msg['To'] = email
         msg['Subject'] = 'Regarding Your Complaint'
@@ -71,10 +72,9 @@ def email_customer(emails: list[str], customized_responses: list[str]):
         msg.attach(MIMEText(body, 'plain'))
 
         # Send email
-        with smtplib.SMTP(server, port) as server:
-            server.starttls()
-            server.login(sender_email, sender_password)
-            server.sendmail(sender_email, email, msg.as_string())
+        server.sendmail(sender_email, email, msg.as_string())
+    
+    server.quit()
 
 
 def market_analysis():
@@ -91,7 +91,7 @@ def market_analysis():
     # otherDataFrame = pd.DataFrame(other_data)
     # other_data_json = otherDataFrame.to_json(orient='records')
     # other_analysis_tool = RealEstateAnalysisTool(other_data)
-    # other_average_price = other_analysis_tool.average_price_per_square_meter()
+    # other_average_price = other_analysis_tool.average_price_per_square_meter()""
     # other_property_type = other_analysis_tool.property_type_distribution()
 
     response = {
