@@ -1,10 +1,11 @@
-from pydantic import BaseModel, Field
-from RealEstateAnalysisTool import RealEstateAnalysisTool
-from web_scaping_dovec import scrape_dovec_website
-import pandas as pd
 import smtplib
-from email.mime.multipart import MIMEMultipart
+import pandas as pd
 from email.mime.text import MIMEText
+from pydantic import BaseModel, Field
+from email.mime.multipart import MIMEMultipart
+from web_scraping.dovec_scraping import scrape_dovec_website
+from web_scraping.dogakent_scraping import scrape_dogakent_website
+from web_scraping.RealEstateAnalysisTool import RealEstateAnalysisTool
 
 
 class NoParamsSchema(BaseModel):
@@ -19,85 +20,93 @@ class SendEmailSchema(BaseModel):
     emails: str = Field(..., title="Emails", description="Emails required")
     customized_responses: str = Field(..., title="Customized Responses", description="Customized Responses required")
 
-def filter_property_data(prompt, data):
-    keywords = prompt.lower().split()
-    filtered_properties = []
-    for property in data:
-        if all(keyword in property['Location'].lower() or
-               keyword in property['property_details'].lower() or
-               keyword in property['Property Type'].lower() for keyword in keywords):
-            filtered_properties.append({
-                "Name": property["Name"],
-                "Location": property["Location"],
-                "Price": property["Price"],
-                "currency": property["currency"],
-                "Square Meter": property["Square Meter"],
-                "Property Type": property["Property Type"],
-                "image": property["image"]
-            })
-    return filtered_properties
 
-def find_best_property(prompt):
-    #dovec_scraped_data = scrape_dovec_website()
-    #return dovec_scraped_data
-    dovec_scraped_data = scrape_dovec_website()
-    filtered_properties = filter_property_data(prompt, dovec_scraped_data)
-    
-    return filtered_properties
+def find_best_property():
+    """
+    Finds the best property based on the customer's preferences and budget constraints.
 
+    Returns:
+        list: A list containing up to 5 best property options scraped from the Dovec website.
 
-def email_customers(emails: str, customized_responses: str):
-    # emails and customized_responses must be converted to lists
-    emails_list = emails.split("---")
-    responses_list = customized_responses.split("---")
+    Raises:
+        Exception: If an error occurs during data scraping.
+    """
 
-    # Email configuration
-    port = 587
-    sender_email = "noorulzayn10@gmail.com"
-    sender_password = "bxui jote surb gxde"
-    server = smtplib.SMTP("smtp.gmail.com", port)
-    server.ehlo()
-    server.starttls()
-
-    server.login(sender_email, sender_password)
-
-    # Loop through each email and customized response
-    for email, response in zip(emails_list, responses_list):
-        # Create message
-        msg = MIMEMultipart("alternative")
-        msg['From'] = sender_email
-        msg['To'] = email
-        msg['Subject'] = "Apology and Resolution: Addressing Your Recent Concerns"
-
-    # Attach customized response as message body
-        body = response
-        msg.attach(MIMEText(body, 'plain'))
-
-    # Send email
-        server.sendmail(sender_email, email, msg.as_string())
-
-    server.quit()
-
-    return "Success"
+    # max 5 because more will take so much time
+    try:
+        return scrape_dovec_website()[:5]
+    except Exception as e:
+        return str(e)
 
 
 def market_analysis():
-    dovec_data = scrape_dovec_website()
-    dovec_analysis_tool = RealEstateAnalysisTool(dovec_data)
-    dovec_average_price_per_square_meter = dovec_analysis_tool.average_price_per_square_meter()
-    dovec_property_type = dovec_analysis_tool.property_type_distribution()
-    dovec_average_price_per_property_type = dovec_analysis_tool.average_price_per_property_type()
+    """
+    Analyzes real estate market data for Dovec and Dogakent locations, 
+    providing insights into the average price per square meter, 
+    property type distribution, and average price per property type.
 
-    return {
-        "average_price_per_square_meter": dovec_average_price_per_square_meter,
-        "property_type_distribution": dovec_property_type,
-        "average_price_per_property_type": dovec_average_price_per_property_type,
-    }
+    Returns:
+        dict: A dictionary containing analysis results for Dovec and Dogakent locations.
+            - For each location, the following information is provided:
+                - "average_price_per_square_meter": The average price per square meter.
+                - "property_type_distribution": Distribution of property types.
+                - "average_price_per_property_type": Average price per property type.
+
+    Raises:
+        Exception: If an error occurs during data scraping or analysis.
+    """
+
+    # analyzing Dovec market
+    try:
+        dovec_data = scrape_dovec_website()
+        dovec_analysis_tool = RealEstateAnalysisTool(dovec_data)
+        dovec_average_price_per_square_meter = dovec_analysis_tool.average_price_per_square_meter()
+        dovec_property_type = dovec_analysis_tool.property_type_distribution()
+        dovec_average_price_per_property_type = dovec_analysis_tool.average_price_per_property_type()
+
+        # analyzing Dogakent market
+        dogakent_data = scrape_dogakent_website()
+        dogakent_analysis_tool = RealEstateAnalysisTool(dogakent_data)
+        dogakent_average_price_per_square_meter = dogakent_analysis_tool.average_price_per_square_meter()
+        dogakent_property_type = dogakent_analysis_tool.property_type_distribution()
+        dogakent_average_price_per_property_type = dogakent_analysis_tool.average_price_per_property_type()
+
+        return {
+            "Dovec": {
+                "dovec_average_price_per_square_meter": dovec_average_price_per_square_meter,
+                "dovec_property_type_distribution": dovec_property_type,
+                "dovec_average_price_per_property_type": dovec_average_price_per_property_type,
+            },
+            "Dogakent": {
+                "dogakent_average_price_per_square_meter": dogakent_average_price_per_square_meter,
+                "dogakent_property_type_distribution": dogakent_property_type,
+                "dogakent_average_price_per_property_type": dogakent_average_price_per_property_type,
+            }
+        }
+
+    except Exception as e:
+        return str(e)
 
 
 def analyze_complaints():
+    """
+    Analyzes the complaints data to identify key trends, patterns, and insights, providing feedback to the company.
+
+    Reads complaints data from an Excel file and performs analysis to generate two sets of information:
+        1. Details of individual complaints.
+        2. Counts of complaints grouped by property ID.
+
+    Returns:
+        dict: A dictionary containing two keys:
+            - "complaints": JSON representation of individual complaints.
+            - "complaint_counts": JSON representation of complaint counts grouped by property ID.
+
+    Raises:
+        Exception: If any other error occurs during data reading or analysis.
+    """
+
     # get data from our server
-    df = pd.read_excel('complaints.xlsx')
+    df = pd.read_excel('data/complaints.xlsx')
     # perform analysis
     complaint_counts = df.groupby('prop_id')['complaints'].count().reset_index()
 
@@ -109,7 +118,64 @@ def analyze_complaints():
     }
 
 
+def email_customers(emails: str, customized_responses: str):
+    """
+    Sends personalized email responses to customers based on the provided parameters.
+
+    Args:
+        emails (str): A string containing email addresses separated by '---'.
+        customized_responses (str): A string containing customized responses separated by '---'.
+
+    Returns:
+        str: A message indicating the success of the email sending process.
+
+    Raises:
+        Exception: If an error occurs during the email sending process.
+    """
+
+    try:
+        # emails and customized_responses must be converted to lists
+        emails_list = emails.split("---")
+        responses_list = customized_responses.split("---")
+
+        # Email configuration
+        port = 587
+        sender_email = "noorulzayn10@gmail.com"
+        sender_password = "bxui jote surb gxde"  # dummy password no need for .env
+        server = smtplib.SMTP("smtp.gmail.com", port)
+        server.ehlo()
+        server.starttls()
+
+        server.login(sender_email, sender_password)
+
+        # Loop through each email and customized response
+        for email, response in zip(emails_list, responses_list):
+            # Create message
+            msg = MIMEMultipart("alternative")
+            msg['From'] = sender_email
+            msg['To'] = email
+            msg['Subject'] = "Apology and Resolution: Addressing Your Recent Concerns"
+
+        # Attach customized response as message body
+            body = response
+            msg.attach(MIMEText(body, 'plain'))
+
+        # Send email
+            server.sendmail(sender_email, email, msg.as_string())
+
+        server.quit()
+    except Exception as e:
+        return str(e)
+
+    return "Success"
+
+
 def custom_json_schema(model):
+    """
+    Generate a custom JSON schema for the given Pydantic model, 
+    so CMND.AI pass them as parameters to the intended functions.
+    """
+
     schema = model.schema()
     properties_formatted = {
         k: {
@@ -139,7 +205,7 @@ tools = [
         "rerunWithDifferentParameters": True
     },
     {
-        "name": "market_analysis",
+        "name": "do_market_analysis",
         "description": "Present a brief summary of the current real estate market trends and developments. Location Analysis: Visualize the average price per square meter for each location using a heatmap or bar chart. Analyze the distribution of property types in each location with a stacked bar chart or pie chart. Property Type Distribution: Display the distribution of property types using a pie chart or horizontal bar chart. Price Analysis: Compare the average price per square meter across different property types using a line graph or box plot. Conclusion: Summarize key insights and provide recommendations for stakeholders based on the analysis.",
         "parameters": custom_json_schema(NoParamsSchema),
         "runCmd": market_analysis,

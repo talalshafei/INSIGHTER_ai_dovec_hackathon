@@ -1,16 +1,20 @@
 import requests
 import xml.etree.ElementTree as ET
 import requests
-from bs4 import BeautifulSoup
 import re
+from data.remote_urls import DOVEC_DATA
 
 
 def scrape_dovec_website():
 
-    xml_url = "https://dovecconstruction.com/emlak.xml"
+    xml_url = DOVEC_DATA
 
     # Send the request to the XML URL
-    response = requests.get(xml_url)
+    try:
+        response = requests.get(xml_url)
+    except Exception as e:
+        print("Failed to send fetch data from dovec to the website.")
+        raise f"Dovec Website is not reachable. {e}"
 
     # Check if the request was successful
     if response.status_code == 200:
@@ -64,7 +68,3 @@ def scrape_dovec_website():
     else:
         print("Failed to retrieve data from the website. Status code:", response.status_code)
         return None
-
-
-#scraped_data = scrape_dovec_website()
-#print(scraped_data)
