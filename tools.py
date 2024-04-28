@@ -228,7 +228,7 @@ tools = [
     },
     {
         "name": "email_customers",
-        "description": "Send personalized email responses to customers who have submitted complaints. the function must take parameters: emails and customized responses both of which must be a long string separated by '---'. The function should send an email to each customer with their respective customized response. then return 'Success' if the emails are sent successfully.",
+        "description": "Send personalized email responses to customers who have submitted complaints. the function must take parameters: emails and customized responses both of which must be a long string separated by '---'. The function should send an email to each customer with their respective customized response. Also at the end of the email write from Dovec Customer Support , then return 'Success' if the emails are sent successfully.",
         "parameters": custom_json_schema(SendEmailSchema),
         "runCmd": email_customers,
         "isDangerous": False,
