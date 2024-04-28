@@ -48,12 +48,12 @@ def scrape_dovec_website():
 
             # Store the data in a dictionary
             property_data = {
-                "Name": title,
-                "Location": location,
-                "Price": price,
+                "name": title,
+                "location": location,
+                "price": price,
                 "currency": currency,
-                "Square Meter": square_meter,
-                "Property Type": property_type,
+                "square_meter": square_meter,
+                "property_type": property_type,
                 "property_details": details,
                 "image": image,
                 "map": map_location,

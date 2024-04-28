@@ -70,13 +70,11 @@ def scrape_dogakent_website():
 
             # Store the data in a dictionary
             property_data = {
-                "Location": location,
-                "Price": price,
-                "Square-meter": square_meter,
+                "location": location,
+                "price": price,
+                "square_meter": square_meter,
                 "property_type": property_type
             }
-
-            print(property_data)
 
             # Append the dictionary to the list
             scraped_data.append(property_data)

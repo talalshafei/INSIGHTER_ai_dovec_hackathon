@@ -56,8 +56,8 @@ def market_analysis():
         Exception: If an error occurs during data scraping or analysis.
     """
 
-    # analyzing Dovec market
     try:
+        # analyzing Dovec market
         dovec_data = scrape_dovec_website()
         dovec_analysis_tool = RealEstateAnalysisTool(dovec_data)
         dovec_average_price_per_square_meter = dovec_analysis_tool.average_price_per_square_meter()

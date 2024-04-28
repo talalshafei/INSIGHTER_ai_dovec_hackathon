@@ -10,9 +10,9 @@ class RealEstateAnalysisTool:
 
         # Iterate over the property data
         for property_info in self.property_data:
-            location = property_info.get("Location")  # Get location or None if missing
-            price = property_info.get("Price")
-            square_meter = property_info.get("Square Meter")
+            location = property_info.get("location")  # Get location or None if missing
+            price = property_info.get("price")
+            square_meter = property_info.get("square_meter")
 
             # Skip if location, price, or square_meter is missing
             if location is None or price is None or square_meter is None:
@@ -45,7 +45,7 @@ class RealEstateAnalysisTool:
         property_type_counts = {}
 
         for property_info in self.property_data:
-            property_type = property_info["Property Type"]
+            property_type = property_info["property_type"]
             if property_type in property_type_counts:
                 property_type_counts[property_type] += 1
             else:
@@ -58,9 +58,9 @@ class RealEstateAnalysisTool:
         property_type_avg_price = {}
 
         for property_info in self.property_data:
-            property_type = property_info.get("Property Type")
-            price = property_info.get("Price")
-            square_meter = property_info.get("Square Meter")
+            property_type = property_info.get("property_type")
+            price = property_info.get("price")
+            square_meter = property_info.get("square_meter")
 
             if property_type and price and square_meter:
                 price_per_square_meter = int(price) / int(square_meter)
