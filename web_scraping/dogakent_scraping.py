@@ -73,7 +73,8 @@ def scrape_dogakent_website():
                 "location": location,
                 "price": price,
                 "square_meter": square_meter,
-                "property_type": property_type
+                "property_type": property_type,
+                "currency": "pounds"
             }
 
             # Append the dictionary to the list

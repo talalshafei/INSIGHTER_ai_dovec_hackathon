@@ -26,10 +26,13 @@ def scrape_dovec_website():
 
         # Iterate over each item tag in the XML
         for item in root.findall('item'):
+            price = item.find('price').text
+            if price is None or price == "0":
+                # skip if price is 0
+                continue
+
             title = item.find('title').text
             location = item.find('location').text
-            price = item.find('price').text
-            currency = item.find('pricetype').text
             image = item.find('thumb').text
             map_location = item.find('map').text
             details = item.find('content').text.strip()
@@ -51,7 +54,7 @@ def scrape_dovec_website():
                 "name": title,
                 "location": location,
                 "price": price,
-                "currency": currency,
+                "currency": "pounds",
                 "square_meter": square_meter,
                 "property_type": property_type,
                 "property_details": details,
